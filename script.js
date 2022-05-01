@@ -63,7 +63,7 @@ const userClick = () => {
 };
 const handleSubmit = (event) => {
   event.preventDefault();
-  console.log(store.city);
+  console.log(object.city);
   fetchData();
   userClick();
 };
