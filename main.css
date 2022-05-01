@@ -1,0 +1,133 @@
+body{
+    font-family: 'inter',sans-serif;
+}
+
+.container{
+    margin:0 auto;
+    max-width: 768px;
+    height: 1024px;
+    background: linear-gradient(150.64deg, #8E2DE2 0%, #4A00E0 100%);
+}
+
+.title{
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 34px;
+    padding-top: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.all-info {
+    margin-top: 344px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    
+}
+
+/* .all-info_hide{
+    display:none
+} */
+
+.all-info h1{
+font-size: 72px;
+font-weight: 500;
+line-height: 87px;
+color:  #FFFFFF;
+}
+
+.all-info p { 
+font-size: 24px;
+font-weight: 400;
+line-height: 36px;
+color:  #FFFFFF;
+opacity: 0.8;
+}
+
+.all-info button{
+    margin-top: 36px;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 28px;
+    color:#FFFFFF;
+    background: transparent;
+    border: none;
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+.smth_wrong{
+    display: none
+}
+.change-city{
+    display:none;
+}
+
+/* .popup {
+    /display: block;
+    margin:0 auto;
+    width: 100%;
+    height: 100%;
+    transition: 0.5s all;
+    position: relative;
+    top: 0; 
+
+    background: linear-gradient(150.64deg, #8E2DE2 0%, #4A00E0 100%);
+  } */
+  
+  .popup {
+    position: fixed;
+    top: 0;
+    width: 768px;
+    transform: translateY(-200%);
+    background: linear-gradient(150.64deg, #8E2DE2 0%, #4A00E0 100%);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease-in-out;
+    z-index: 9;
+  }
+  
+  .popup.active {
+    transform: translateY(0);
+  }
+  
+  .form{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+  }
+
+  .form input{
+      padding-left: 46px;
+    color: rgba(255, 255, 255, 0.879);
+    width: 182px;
+    font-family: Inter;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 36px;
+    background: transparent;
+    border: none;
+  }
+
+  .form button {
+      width:140px;
+    padding: 6px 49px;
+    color: #4C01E0;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 36px;
+    background: #FFFFFF;
+    border-radius: 8px;
+  }
+
+  .line{
+      width: 326px;
+      color: rgba(255, 255, 255, 0.7);
+  }
