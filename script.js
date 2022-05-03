@@ -1,6 +1,3 @@
-const link =
-  "http://api.weatherstack.com/current?access_key=f2976b78f737b2ff67b8e1b7ac7f8092"; /// создаю переменную для ссылки
-
 const main = document.querySelector(".all-info");
 const change = document.querySelector(".btn-change");
 const choseCity = document.querySelector(".change-city");
@@ -8,77 +5,130 @@ const allInfo = document.querySelector(".all-info");
 const popup = document.getElementById("popup");
 const findButton = document.querySelector(".find-city");
 const cityInput = document.querySelector(".city-input");
-const form = document.querySelector(".form"); //// получаю все нужные мне узлы
+const form = document.querySelector(".form");
 
-let object = {
-  city: "Moscow",
-  description: 0,
-  temperature: 0,
-}; ////создаю объект с которым буду работать
+const geoLocation = () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+    navigator.geolocation.getCurrentPosition(getCityByIp);
+  }
+};
 
-//// Пишу асинхронную функцию для получения данных с сервера и отрисовки блоков по полученным данным
-const fetchData = async () => {
-  const fetchResult = await fetch(`${link}&query=${object.city}`);
-  // console.log(fetchResult);
-  const data = await fetchResult.json(); //// получаю объект с сервера
-  console.log(data);
-  const {
-    current: { city, weather_descriptions: description, temperature },
-  } = data; ////деструктуризирую полученный объект
+const showPosition = (position) => {
+  let latitude = position.coords.latitude;
+  let longitude = position.coords.longitude;
+  console.log(latitude, longitude);
+  let limit = 1;
+  const openWeather = `http://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=${limit}&appid=a44763c6c3839a45a3942f0d92a8bb3b`;
 
-  object = {
-    ...object,
-    temperature,
-    description: description[0], ////перезаписываю свой объект, description[0] так как с сервера под этим ключом приходит массив с 1 элементом, обращаюсь к нему
+  const fetchData = async () => {
+    const fetchResult = await fetch(openWeather);
+    const data = await fetchResult.json();
+    console.log(data);
+    const weatherForCity = `https://api.openweathermap.org/data/2.5/weather?q=${data[0].name}&appid=a44763c6c3839a45a3942f0d92a8bb3b`;
+
+    const weatherByData = async () => {
+      const weatherResult = await fetch(weatherForCity);
+      const dataByCity = await weatherResult.json();
+      const { name } = dataByCity;
+      const { temp } = dataByCity.main;
+      const { description } = dataByCity.weather[0];
+
+      const divInfo = () => {
+        return `
+          <div class="weather-info">
+              <h1>${Math.floor((temp - 32) / (5 * 9))}℃</h1>
+              <p>${description} in ${name}
+          </div>
+          <div >
+                  <button class="btn-change">Change citty</button>
+              </div>`;
+      };
+
+      const createDiv = () => {
+        main.innerHTML = divInfo();
+        const change = document.querySelector(".btn-change");
+        change.addEventListener("click", userClick);
+      };
+
+      createDiv();
+    };
+    weatherByData();
   };
 
-  console.log(object);
-  createDiv(); ////отрисовываю объект как приходит промис
+  fetchData();
 };
 
-const divInfo = () => {
-  ////отдельная функция для создания нового узла
-  const { city, description, temperature } = object;
+function getCityByIp() {
+  fetch("https://api.ipify.org/?format=json")
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      fetch(
+        `https://geo.ipify.org/api/v2/country,city?apiKey=at_38nQZzdTsm4C9PFIdiAE9383WbSKe&ipAddress=${data.ip}`
+      )
+        .then((response) =>
+          //   data.json();
+          response.json()
+        )
+        .then((data) => getWeather(data.location.city));
+    });
+}
+
+function getWeather(city) {
+  fetch(
+    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=a44763c6c3839a45a3942f0d92a8bb3b`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      weatherByData(data);
+    });
+}
+getCityByIp();
+
+const weatherByData = ({ name, main, weather }) => {
+  const drawCard = divInfo(name, main.temp, weather[0].description);
+
+  createDiv(drawCard);
+};
+// weatherByData();
+
+const divInfo = (name, temp, description) => {
+  console.log(name, temp, description);
   return `
-    <div class="weather-info">
-        <h1>${temperature}℃</h1>
-        <p>${description} in ${city}
-    </div>
-    <div >
-            <button class="btn-change">Change citty</button>
-        </div>`;
+      <div class="weather-info">
+          <h1>${Math.floor((temp - 32) / (5 * 9))}℃</h1>
+          <p>${description} in ${name}
+      </div>
+      <div >
+              <button class="btn-change">Change citty</button>
+          </div>`;
 };
 
-////Функция для отрисовки, которая вставляет созданный мной объект
-const createDiv = () => {
-  main.innerHTML = divInfo();
+const createDiv = (drawCard) => {
+  main.innerHTML = drawCard;
   const change = document.querySelector(".btn-change");
 
-  change.addEventListener("click", userClick); ////добавляю слушатель внутри этой функции, так как до ее вызова, узла не существует, а функция не выполнится пока промис не придет
+  change.addEventListener("click", userClick);
 };
+geoLocation();
 
-////все что ниже связанно с добавлением слушателей на кнопочки и переключением классов
 const userClick = () => {
   popup.classList.toggle("active");
 };
 const handleSubmit = (event) => {
   event.preventDefault();
-  console.log(object.city);
-  fetchData();
+  getWeather(cityInput.value);
   userClick();
 };
 
 findButton.addEventListener("click", handleSubmit);
 
 const handleInput = (element) => {
-  object = {
-    ...object,
-    city: element.target.value, ////перезаписываю элемент, меняя в нем город на введенный пользователем
-  };
+  return element.target.value;
 };
 
 cityInput.addEventListener("input", handleInput);
 form.addEventListener("submit", handleSubmit);
-
-////вызываю  свою асинхронную функцию
-fetchData();
